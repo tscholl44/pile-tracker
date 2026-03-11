@@ -6,11 +6,13 @@ interface PileMarkerProps {
   pile: Pile
   isSelected: boolean
   onSelect: () => void
+  scale: number
 }
 
-const MARKER_RADIUS = 12
+const BASE_RADIUS = 8
 
-export function PileMarker({ pile, isSelected, onSelect }: PileMarkerProps) {
+export function PileMarker({ pile, isSelected, onSelect, scale }: PileMarkerProps) {
+  const radius = Math.max(4, Math.round(BASE_RADIUS * scale))
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation()
     onSelect()
@@ -27,7 +29,7 @@ export function PileMarker({ pile, isSelected, onSelect }: PileMarkerProps) {
         <circle
           cx={`${pile.x_percent}%`}
           cy={`${pile.y_percent}%`}
-          r={MARKER_RADIUS + 4}
+          r={radius + 4}
           fill="none"
           stroke={pile.color}
           strokeWidth="2"
@@ -40,7 +42,7 @@ export function PileMarker({ pile, isSelected, onSelect }: PileMarkerProps) {
       <circle
         cx={`${pile.x_percent}%`}
         cy={`${pile.y_percent}%`}
-        r={MARKER_RADIUS}
+        r={radius}
         fill={pile.color}
         fillOpacity={0.8}
         stroke="white"

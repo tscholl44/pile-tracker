@@ -255,6 +255,7 @@ export function PdfViewer({
             onPileSelect={onPileSelect}
             onClick={handleOverlayClick}
             isPlacementMode={isPlacementMode}
+            scale={scale}
           />
         </div>
       </div>

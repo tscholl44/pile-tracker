@@ -9,6 +9,7 @@ interface PileOverlayProps {
   onPileSelect: (pileId: string | null) => void
   onClick: (e: React.MouseEvent<HTMLDivElement>) => void
   isPlacementMode: boolean
+  scale: number
 }
 
 export function PileOverlay({
@@ -17,6 +18,7 @@ export function PileOverlay({
   onPileSelect,
   onClick,
   isPlacementMode,
+  scale,
 }: PileOverlayProps) {
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     // Only handle direct clicks on the overlay, not on markers
@@ -46,6 +48,7 @@ export function PileOverlay({
             pile={pile}
             isSelected={selectedPileId === pile.id}
             onSelect={() => onPileSelect(pile.id)}
+            scale={scale}
           />
         ))}
       </svg>
