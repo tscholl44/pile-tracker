@@ -41,7 +41,12 @@ export function PdfViewer({
   const [isPlacementMode, setIsPlacementMode] = useState(false)
   const [pendingClick, setPendingClick] = useState<{ x: number; y: number } | null>(null)
   const [containerDimensions, setContainerDimensions] = useState({ width: 0, height: 0 })
+  const [isGrabbing, setIsGrabbing] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const isPanning = useRef(false)
+  const hasDragged = useRef(false)
+  const panStart = useRef({ x: 0, y: 0, scrollLeft: 0, scrollTop: 0 })
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages)
@@ -60,8 +65,36 @@ export function PdfViewer({
   const handlePrevPage = () => onPageChange(Math.max(currentPage - 1, 1))
   const handleNextPage = () => onPageChange(Math.min(currentPage + 1, numPages))
 
+  const handlePanStart = (e: React.MouseEvent<HTMLDivElement>) => {
+    if ((e.target as HTMLElement).closest('button')) return
+    isPanning.current = true
+    hasDragged.current = false
+    setIsGrabbing(true)
+    panStart.current = {
+      x: e.clientX,
+      y: e.clientY,
+      scrollLeft: scrollContainerRef.current?.scrollLeft ?? 0,
+      scrollTop: scrollContainerRef.current?.scrollTop ?? 0,
+    }
+    e.preventDefault()
+  }
+
+  const handlePanMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isPanning.current || !scrollContainerRef.current) return
+    const dx = e.clientX - panStart.current.x
+    const dy = e.clientY - panStart.current.y
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) hasDragged.current = true
+    scrollContainerRef.current.scrollLeft = panStart.current.scrollLeft - dx
+    scrollContainerRef.current.scrollTop = panStart.current.scrollTop - dy
+  }
+
+  const handlePanEnd = () => {
+    isPanning.current = false
+    setIsGrabbing(false)
+  }
+
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isPlacementMode) return
+    if (!isPlacementMode || hasDragged.current) return
 
     const rect = e.currentTarget.getBoundingClientRect()
     const x = e.clientX - rect.left
@@ -177,7 +210,15 @@ export function PdfViewer({
       </div>
 
       {/* PDF Container */}
-      <div className="flex-1 overflow-auto bg-gray-100 p-4">
+      <div
+        ref={scrollContainerRef}
+        className="flex-1 overflow-auto bg-gray-100 p-4 select-none"
+        style={{ cursor: isPlacementMode ? 'crosshair' : isGrabbing ? 'grabbing' : 'grab' }}
+        onMouseDown={handlePanStart}
+        onMouseMove={handlePanMove}
+        onMouseUp={handlePanEnd}
+        onMouseLeave={handlePanEnd}
+      >
         <div
           ref={containerRef}
           className={`relative inline-block ${isPlacementMode ? 'placement-mode' : ''}`}
