@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { Trash2 } from 'lucide-react'
@@ -20,6 +20,7 @@ export function PileAttributesPanel({
 }: PileAttributesPanelProps) {
   const [formData, setFormData] = useState<Partial<Pile>>({})
   const [isSaving, setIsSaving] = useState(false)
+  const notesTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Reset form when pile changes
   useEffect(() => {
@@ -79,11 +80,19 @@ export function PileAttributesPanel({
 
   const handleNotesChange = (value: string) => {
     setFormData((prev) => ({ ...prev, notes: value }))
+    if (notesTimerRef.current) clearTimeout(notesTimerRef.current)
+    notesTimerRef.current = setTimeout(() => {
+      saveChanges({ notes: value })
+      notesTimerRef.current = null
+    }, 500)
   }
 
-  const handleNotesBlur = () => {
-    saveChanges({ notes: formData.notes })
-  }
+  // Clear timer on unmount
+  useEffect(() => {
+    return () => {
+      if (notesTimerRef.current) clearTimeout(notesTimerRef.current)
+    }
+  }, [])
 
   const handleColorChange = (color: string) => {
     setFormData((prev) => ({ ...prev, color }))
@@ -240,7 +249,6 @@ export function PileAttributesPanel({
             rows={3}
             value={formData.notes ?? ''}
             onChange={(e) => handleNotesChange(e.target.value)}
-            onBlur={handleNotesBlur}
             placeholder="Add notes about this pile..."
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
             data-testid="notes-input"
