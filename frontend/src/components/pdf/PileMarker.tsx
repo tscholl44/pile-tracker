@@ -12,7 +12,7 @@ interface PileMarkerProps {
 const BASE_RADIUS = 8
 
 export function PileMarker({ pile, isSelected, onSelect, scale }: PileMarkerProps) {
-  const radius = Math.max(4, Math.round(BASE_RADIUS * scale))
+  const radius = Math.max(7, Math.round(BASE_RADIUS * scale))
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation()
     onSelect()
