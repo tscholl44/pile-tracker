@@ -37,7 +37,7 @@ export function PdfViewer({
   onPileCreate,
 }: PdfViewerProps) {
   const [numPages, setNumPages] = useState<number>(0)
-  const [scale, setScale] = useState(1)
+  const [scale, setScale] = useState(0.25)
   const [isPlacementMode, setIsPlacementMode] = useState(false)
   const [pendingClick, setPendingClick] = useState<{ x: number; y: number } | null>(null)
   const [containerDimensions, setContainerDimensions] = useState({ width: 0, height: 0 })
@@ -55,7 +55,7 @@ export function PdfViewer({
   }, [])
 
   const handleZoomIn = () => setScale((prev) => Math.min(prev + 0.25, 3))
-  const handleZoomOut = () => setScale((prev) => Math.max(prev - 0.25, 0.5))
+  const handleZoomOut = () => setScale((prev) => Math.max(prev - 0.25, 0.25))
 
   const handlePrevPage = () => onPageChange(Math.max(currentPage - 1, 1))
   const handleNextPage = () => onPageChange(Math.min(currentPage + 1, numPages))
