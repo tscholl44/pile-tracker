@@ -45,7 +45,8 @@ export function PileMarker({ pile, isSelected, onSelect }: PileMarkerProps) {
         fillOpacity={0.8}
         stroke="white"
         strokeWidth={isSelected ? 3 : 2}
-        className="pile-marker transition-transform hover:scale-110"
+        className="pile-marker transition-transform hover:scale-125"
+        style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
       />
 
       {/* Inner dot for better visibility */}
